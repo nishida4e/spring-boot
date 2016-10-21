@@ -4827,7 +4827,8 @@ how your tests will run:
 * `MOCK` -- Loads a `WebApplicationContext` and provides a mock servlet environment.
   Embedded servlet containers are not started when using this annotation. If servlet
   APIs are not on your classpath this mode will transparently fallback to creating a
-  regular non-web `ApplicationContext`.
+  regular non-web `ApplicationContext`. Can be used in conjunction with
+  `@AutoConfigureMockMvc` for `MockMvc`-based testing of your application.
 * `RANDOM_PORT` -- Loads an `EmbeddedWebApplicationContext` and provides a real
   servlet environment. Embedded servlet containers are started and listening on a random
   port.
@@ -4906,28 +4907,7 @@ For convenience, tests that need to make REST calls to the started server can ad
 
 [source,java,indent=0]
 ----
-	import org.junit.*;
-	import org.junit.runner.*;
-	import org.springframework.boot.test.context.web.*;
-	import org.springframework.boot.test.web.client.*;
-	import org.springframework.test.context.junit4.*;
-
-	import static org.assertj.core.api.Assertions.*
-
-	@RunWith(SpringRunner.class)
-	@SpringBootTest(webEnvironment=WebEnvironment.RANDOM_PORT)
-	public class MyWebIntegrationTests {
-
-		@Autowired
-		private TestRestTemplate restTemplate;
-
-		@Test
-		public void exampleTest() {
-			String body = this.restTemplate.getForObject("/", String.class);
-			assertThat(body).isEqualTo("Hello World");
-		}
-
-	}
+include::{code-examples}/test/web/RandomPortExampleTests.java[tag=test-random-port]
 ----
 
 

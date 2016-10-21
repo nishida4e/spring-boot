@@ -1434,8 +1434,8 @@ By default, `spring-boot-starter-thymeleaf` uses Thymeleaf 2.1. If you are using
 [source,xml,indent=0,subs="verbatim,quotes,attributes"]
 ----
 	<properties>
-		<thymeleaf.version>3.0.0.RELEASE</thymeleaf.version>
-		<thymeleaf-layout-dialect.version>2.0.3</thymeleaf-layout-dialect.version>
+		<thymeleaf.version>3.0.2.RELEASE</thymeleaf.version>
+		<thymeleaf-layout-dialect.version>2.0.4</thymeleaf-layout-dialect.version>
 	</properties>
 ----
 
@@ -3203,12 +3203,12 @@ but the rest of it is normal for a Spring application in Servlet 2.5. Example:
 		</listener>
 
 		<filter>
-			<filter-name>metricFilter</filter-name>
+			<filter-name>metricsFilter</filter-name>
 			<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
 		</filter>
 
 		<filter-mapping>
-			<filter-name>metricFilter</filter-name>
+			<filter-name>metricsFilter</filter-name>
 			<url-pattern>/*</url-pattern>
 		</filter-mapping>
 

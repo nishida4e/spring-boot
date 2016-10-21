@@ -66,6 +66,7 @@ import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletCon
 import org.springframework.boot.context.embedded.undertow.UndertowBuilderCustomizer;
 import org.springframework.boot.context.embedded.undertow.UndertowEmbeddedServletContainerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.EnvironmentAware;
@@ -658,15 +659,15 @@ public class ServerProperties
 		private Charset uriEncoding;
 
 		/**
-		 * Maximum number of connections that the server will accept and process
-		 * at any given time. Once the limit has been reached, the operating system
-		 * may still accept connections based on the "acceptCount" property.
+		 * Maximum number of connections that the server will accept and process at any
+		 * given time. Once the limit has been reached, the operating system may still
+		 * accept connections based on the "acceptCount" property.
 		 */
 		private int maxConnections = 0;
 
 		/**
-		 * Maximum queue length for incoming connection requests when all possible
-		 * request processing threads are in use.
+		 * Maximum queue length for incoming connection requests when all possible request
+		 * processing threads are in use.
 		 */
 		private int acceptCount = 0;
 
@@ -827,34 +828,37 @@ public class ServerProperties
 				public void customize(Connector connector) {
 					ProtocolHandler handler = connector.getProtocolHandler();
 					if (handler instanceof AbstractProtocol) {
-						AbstractProtocol protocol = (AbstractProtocol) handler;
+						AbstractProtocol<?> protocol = (AbstractProtocol<?>) handler;
 						protocol.setBacklog(Tomcat.this.acceptCount);
 					}
 				}
+
 			});
 		}
 
-		private void customizeMaxConnections(TomcatEmbeddedServletContainerFactory factory) {
+		private void customizeMaxConnections(
+				TomcatEmbeddedServletContainerFactory factory) {
 			factory.addConnectorCustomizers(new TomcatConnectorCustomizer() {
 
 				@Override
 				public void customize(Connector connector) {
 					ProtocolHandler handler = connector.getProtocolHandler();
 					if (handler instanceof AbstractProtocol) {
-						AbstractProtocol protocol = (AbstractProtocol) handler;
+						AbstractProtocol<?> protocol = (AbstractProtocol<?>) handler;
 						protocol.setMaxConnections(Tomcat.this.maxConnections);
 					}
 				}
+
 			});
 		}
 
 		private void customizeConnectionTimeout(
 				TomcatEmbeddedServletContainerFactory factory, int connectionTimeout) {
 			for (Connector connector : factory.getAdditionalTomcatConnectors()) {
-				if (connector.getProtocolHandler() instanceof AbstractProtocol) {
-					AbstractProtocol<?> handler = (AbstractProtocol<?>) connector
-							.getProtocolHandler();
-					handler.setConnectionTimeout(connectionTimeout);
+				ProtocolHandler handler = connector.getProtocolHandler();
+				if (handler instanceof AbstractProtocol) {
+					AbstractProtocol<?> protocol = (AbstractProtocol<?>) handler;
+					protocol.setConnectionTimeout(connectionTimeout);
 				}
 			}
 		}
@@ -1108,6 +1112,7 @@ public class ServerProperties
 				JettyEmbeddedServletContainerFactory factory,
 				final int connectionTimeout) {
 			factory.addServerCustomizers(new JettyServerCustomizer() {
+
 				@Override
 				public void customize(Server server) {
 					for (org.eclipse.jetty.server.Connector connector : server
@@ -1118,6 +1123,7 @@ public class ServerProperties
 						}
 					}
 				}
+
 			});
 		}
 
@@ -1211,6 +1217,7 @@ public class ServerProperties
 		/**
 		 * Number of buffer per region.
 		 */
+		@Deprecated
 		private Integer buffersPerRegion;
 
 		/**
@@ -1238,6 +1245,7 @@ public class ServerProperties
 			this.bufferSize = bufferSize;
 		}
 
+		@DeprecatedConfigurationProperty(reason = "The property is not used by Undertow. See https://issues.jboss.org/browse/UNDERTOW-587 for details")
 		public Integer getBuffersPerRegion() {
 			return this.buffersPerRegion;
 		}
@@ -1278,9 +1286,6 @@ public class ServerProperties
 				UndertowEmbeddedServletContainerFactory factory) {
 			if (this.bufferSize != null) {
 				factory.setBufferSize(this.bufferSize);
-			}
-			if (this.buffersPerRegion != null) {
-				factory.setBuffersPerRegion(this.buffersPerRegion);
 			}
 			if (this.ioThreads != null) {
 				factory.setIoThreads(this.ioThreads);
